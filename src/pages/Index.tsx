@@ -8,11 +8,22 @@ import MetricCard from "@/components/MetricCard";
 import SystemControl from "@/components/SystemControl";
 import WaterStatus from "@/components/WaterStatus";
 import CalibrationPanel from "@/components/CalibrationPanel";
+import AlertSettings from "@/components/AlertSettings";
+import { useAlerts } from "@/hooks/useAlerts";
 
 const Index = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [pumpStatus, setPumpStatus] = useState(false);
   const [lightsStatus, setLightsStatus] = useState(true);
+  const [showAlertSettings, setShowAlertSettings] = useState(false);
+  
+  // Configuración de alertas
+  const [alertConfig, setAlertConfig] = useState({
+    ph: { min: 5.0, max: 7.0 },
+    ec: { min: 0.8, max: 2.8 },
+    lightHours: { target: 16, tolerance: 2 },
+    waterChangeDays: 7
+  });
   
   // Datos simulados que cambiarían en tiempo real
   const [sensorData, setSensorData] = useState({
@@ -24,15 +35,20 @@ const Index = () => {
     lastWaterChange: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 días atrás
   });
 
+  // Hook de alertas
+  useAlerts(sensorData, alertConfig);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
       // Simular pequeñas variaciones en los datos
       setSensorData(prev => ({
         ...prev,
-        ph: Math.max(5.5, Math.min(7.5, prev.ph + (Math.random() - 0.5) * 0.1)),
-        ec: Math.max(1.0, Math.min(3.0, prev.ec + (Math.random() - 0.5) * 0.05)),
-        waterTemp: Math.max(18, Math.min(28, prev.waterTemp + (Math.random() - 0.5) * 0.2))
+        ph: Math.max(4.5, Math.min(8.0, prev.ph + (Math.random() - 0.5) * 0.2)), // Rango más amplio para probar alertas
+        ec: Math.max(0.5, Math.min(3.5, prev.ec + (Math.random() - 0.5) * 0.1)), // Rango más amplio para probar alertas
+        waterTemp: Math.max(18, Math.min(28, prev.waterTemp + (Math.random() - 0.5) * 0.2)),
+        lightHours: Math.max(0, Math.min(24, prev.lightHours + 0.1)), // Incrementar gradualmente
+        waterLevel: Math.random() > 0.95 ? "Bajo" : "OK" // Ocasionalmente simular nivel bajo
       }));
     }, 5000);
 
@@ -77,7 +93,11 @@ const Index = () => {
                 <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
                 En línea
               </Badge>
-              <Button variant="ghost" size="icon">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setShowAlertSettings(!showAlertSettings)}
+              >
                 <Bell className="h-5 w-5 text-gray-600" />
               </Button>
             </div>
@@ -86,6 +106,14 @@ const Index = () => {
       </header>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Configuración de Alertas (condicional) */}
+        {showAlertSettings && (
+          <AlertSettings 
+            config={alertConfig}
+            onConfigChange={setAlertConfig}
+          />
+        )}
+
         {/* Métricas principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
