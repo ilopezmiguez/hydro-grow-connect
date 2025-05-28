@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/", // Change this to your repository name if deploying to a subdirectory
+  base: mode === 'production' ? "/hydro-grow-connect/" : "/", // Update this to match your repository name
   server: {
     host: "::",
     port: 8080,
@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist",
     assetsDir: "assets",
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   plugins: [
     react(),
