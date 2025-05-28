@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
-import { Bell, Thermometer, Clock } from "lucide-react";
+import { Bell, Thermometer, Clock, BarChart3, Home } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 import MetricCard from "@/components/MetricCard";
 import SystemControl from "@/components/SystemControl";
 import WaterStatus from "@/components/WaterStatus";
@@ -12,6 +12,7 @@ import AlertSettings from "@/components/AlertSettings";
 import { useAlerts } from "@/hooks/useAlerts";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [pumpStatus, setPumpStatus] = useState(false);
   const [lightsStatus, setLightsStatus] = useState(true);
@@ -89,6 +90,24 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="text-emerald-600 hover:bg-emerald-50"
+              >
+                <Home className="h-4 w-4 mr-1" />
+                Panel
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/history')}
+                className="text-emerald-600 hover:bg-emerald-50"
+              >
+                <BarChart3 className="h-4 w-4 mr-1" />
+                Historial
+              </Button>
               <Badge variant="outline" className="text-emerald-600 border-emerald-200">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
                 En línea
